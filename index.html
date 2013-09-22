@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drag Drop Test</title>
+    <style type="text/css">
+        .draggable, .droppable {
+
+            border: 1px solid #ccc;
+            display: inline-block;
+            text-align: center;
+            line-height: 100px;
+            font-size: 36px;
+        }
+
+        .droppable {
+            background-color: greenyellow;
+            width: 120px;
+            height: 120px;
+        }
+
+        .draggable {
+            background-color: indianred;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+
+        }
+
+        .drag-over{
+            background-color: aqua;
+        }
+
+
+    </style>
+    <link rel="stylesheet" href="jquery-ui.css" />
+</head>
+<body>
+
+<div class="drag-list">
+
+</div>
+
+<div class="drop-list">
+
+</div>
+
+
+<script type="text/template" id="dragTemplate">
+
+    <div class="draggable" data-value="<%=value%>">
+        <%= value %>
+    </div>
+</script>
+
+<script type="text/template" id="dropTemplate">
+    <div class="droppable" data-value="<%=value%>">
+        <span class="ui-helper-hidden"><%= value %></span>
+    </div>
+</script>
+
+<script type="text/javascript" src="jquery-1.9.1.js"></script>
+<script type="text/javascript" src="underscore.js"></script>
+<script type="text/javascript" src="jquery-ui.js"></script>
+
+<script type="text/javascript">
+
+    var numberArray = _.map(_.range(5), function () {
+        return _.random(100)
+    });
+    var sortedArray = _.sortBy(numberArray, function (item) {
+        return item
+    })
+
+    var dragTemplate = _.template($('#dragTemplate').html());
+    var dropTemplate = _.template($('#dropTemplate').html());
+
+    _.each(numberArray, function (item) {
+        $('.drag-list').append(dragTemplate({value: item}))
+    })
+
+    _.each(sortedArray, function (item) {
+        $('.drop-list').append(dropTemplate({value: item}))
+    })
+
+    $('.draggable').draggable(
+            { revert: 'invalid',
+            stop:function(){
+                console.log(arguments, 'stop');
+            }}
+    );
+    $('.droppable').droppable({
+        hoverClass:'drag-over',
+        accept:function(droppable){
+            var value = $(this).data('value');
+            var droppedValue = droppable.data('value');
+            return value===droppedValue;
+        },
+        drop:function(event, ui){
+            ui.draggable.remove();
+            $(this).find('.ui-helper-hidden').removeClass('ui-helper-hidden');
+        }
+    });
+
+
+</script>
+</body>
+</html>
